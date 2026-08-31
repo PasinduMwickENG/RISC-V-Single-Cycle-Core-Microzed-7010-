@@ -1,0 +1,21 @@
+Vivado Simulator 2019.1
+Time resolution is 1 ps
+======= Starting ALU Tests =======
+PASS | Ctrl=0000 | A=00000005 B=00000003 ? Result=00000008 Zero=0
+PASS | Ctrl=0000 | A=fffffffe B=00000003 ? Result=00000001 Zero=0
+PASS | Ctrl=0001 | A=0000000a B=00000003 ? Result=00000007 Zero=0
+PASS | Ctrl=0001 | A=00000005 B=00000008 ? Result=fffffffd Zero=0
+PASS | Ctrl=0010 | A=f0f0f0f0 B=0f0f0f0f ? Result=00000000 Zero=1
+PASS | Ctrl=0011 | A=f0f0f0f0 B=0f0f0f0f ? Result=ffffffff Zero=0
+PASS | Ctrl=0100 | A=f0f0f0f0 B=0f0f0f0f ? Result=ffffffff Zero=0
+PASS | Ctrl=0101 | A=00000005 B=0000000a ? Result=00000001 Zero=0
+PASS | Ctrl=0101 | A=fffffffe B=00000001 ? Result=00000001 Zero=0
+PASS | Ctrl=0101 | A=00000005 B=00000005 ? Result=00000000 Zero=1
+PASS | Ctrl=0110 | A=fffffffe B=00000001 ? Result=00000000 Zero=1
+PASS | Ctrl=0110 | A=00000001 B=fffffffe ? Result=00000001 Zero=0
+PASS | Ctrl=0111 | A=00000001 B=00000004 ? Result=00000010 Zero=0
+PASS | Ctrl=1000 | A=00000080 B=00000003 ? Result=00000010 Zero=0
+PASS | Ctrl=1001 | A=80000000 B=00000004 ? Result=f8000000 Zero=0
+PASS | Ctrl=0001 | A=00000005 B=00000005 ? Result=00000000 Zero=1
+======= All tests finished =======
+$finish called at time : 160 ns : File "D:/FPGA-Projects/RISC-V Single Cycle/RISC-V Single Cycle.srcs/sim_1/new/ALU_tb.v" Line 99

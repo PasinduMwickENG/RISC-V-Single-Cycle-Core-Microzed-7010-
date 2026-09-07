@@ -19,54 +19,31 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+
 module RISC_V_SingleCycle (
-    input  wire        clk,
-    input  wire        reset,
-
-    // ============================================================
-    // Instruction Memory Interface (Read-only)
-    // ============================================================
-    output wire [31:0] imem_addr,       // Address to Instruction Memory
-    input  wire [31:0] imem_rdata,      // Instruction from Memory
-
-    // ============================================================
-    // Data Memory Interface
-    // ============================================================
-    output wire [31:0] dmem_addr,       // Address to Data Memory
-    output wire [31:0] dmem_wdata,      // Write data
-    input  wire [31:0] dmem_rdata,      // Read data from Memory
-    output wire        dmem_we,         // Write enable
-    output wire        dmem_re,         // Read enable
-    output wire [2:0]  dmem_funct3      // For byte/half/word control
+    input  wire clk,
+    input  wire reset
 );
 
-    //==============================================================
-    // Internal Wires
-    //==============================================================
     wire [31:0] PC, PC_Next, PC_Plus4;
     wire [31:0] Instruction;
     wire [31:0] ImmExt;
     wire [31:0] RD1, RD2;
     wire [31:0] ALUResult;
+    wire [31:0] MemReadData;
     wire [31:0] LoadData;
     wire [31:0] WriteBackData;
     wire [31:0] ALU_B;
 
-    // Control signals
     wire        RegWrite, ALUSrc, MemWrite, MemRead;
     wire        Branch, MemtoReg, Jump;
     wire [1:0]  ALUOp;
     wire [3:0]  ALUControl;
     wire        Zero;
     wire        TakeBranch;
-
-    // PC related
     wire        PCSrc;
     wire [31:0] BranchTarget, JumpTarget;
 
-    //==============================================================
-    // Program Counter
-    //==============================================================
     ProgramCounter PC_reg (
         .clk(clk),
         .reset(reset),
@@ -76,15 +53,11 @@ module RISC_V_SingleCycle (
 
     assign PC_Plus4 = PC + 32'd4;
 
-    //==============================================================
-    // Instruction Memory connection
-    //==============================================================
-    assign imem_addr   = PC;
-    assign Instruction = imem_rdata;
+    InstructionMemory IMEM (
+        .Address(PC),
+        .Instruction(Instruction)
+    );
 
-    //==============================================================
-    // Main Control Unit
-    //==============================================================
     ControlUnit CU (
         .opcode(Instruction[6:0]),
         .funct3(Instruction[14:12]),
@@ -98,17 +71,11 @@ module RISC_V_SingleCycle (
         .Jump(Jump)
     );
 
-    //==============================================================
-    // Immediate Generator
-    //==============================================================
     ImmGen IMM (
         .Instruction(Instruction),
         .ImmExt(ImmExt)
     );
 
-    //==============================================================
-    // Register File
-    //==============================================================
     RegisterFile RF (
         .clk(clk),
         .we(RegWrite),
@@ -120,9 +87,6 @@ module RISC_V_SingleCycle (
         .rd2(RD2)
     );
 
-    //==============================================================
-    // ALU Control
-    //==============================================================
     ALUControl ALU_CTRL (
         .ALUOp(ALUOp),
         .funct3(Instruction[14:12]),
@@ -130,14 +94,8 @@ module RISC_V_SingleCycle (
         .ALUControl(ALUControl)
     );
 
-    //==============================================================
-    // ALU Source Mux
-    //==============================================================
     assign ALU_B = ALUSrc ? ImmExt : RD2;
 
-    //==============================================================
-    // ALU
-    //==============================================================
     ALU ALU_inst (
         .A(RD1),
         .B(ALU_B),
@@ -146,9 +104,6 @@ module RISC_V_SingleCycle (
         .Zero(Zero)
     );
 
-    //==============================================================
-    // Branch Comparator
-    //==============================================================
     BranchComparator BR_COMP (
         .A(RD1),
         .B(RD2),
@@ -156,39 +111,29 @@ module RISC_V_SingleCycle (
         .TakeBranch(TakeBranch)
     );
 
-    //==============================================================
-    // Data Memory connections
-    //==============================================================
-    assign dmem_addr   = ALUResult;
-    assign dmem_wdata  = RD2;
-    assign dmem_we     = MemWrite;
-    assign dmem_re     = MemRead;
-    assign dmem_funct3 = Instruction[14:12];
+    DataMemory DMEM (
+        .clk(clk),
+        .MemWrite(MemWrite),
+        .MemRead(MemRead),
+        .funct3(Instruction[14:12]),
+        .Address(ALUResult),
+        .WriteData(RD2),
+        .ReadData(MemReadData)
+    );
 
-    //==============================================================
-    // Load Extender
-    //==============================================================
     LoadExtender LOAD_EXT (
-        .MemData(dmem_rdata),
+        .MemData(MemReadData),
         .Addr(ALUResult[1:0]),
         .funct3(Instruction[14:12]),
         .ExtData(LoadData)
     );
 
-    //==============================================================
-    // Write-Back Mux
-    //==============================================================
     assign WriteBackData = Jump ? PC_Plus4 :
                            (MemtoReg ? LoadData : ALUResult);
 
-    //==============================================================
-    // Branch & Jump Logic
-    //==============================================================
     assign BranchTarget = PC + ImmExt;
-
-    assign JumpTarget = (Instruction[6:0] == 7'b1100111) ?
-                        ((RD1 + ImmExt) & ~32'd1) :     // jalr
-                        (PC + ImmExt);                  // jal
+    assign JumpTarget   = (Instruction[6:0] == 7'b1100111) ?
+                          ((RD1 + ImmExt) & ~32'd1) : (PC + ImmExt);
 
     assign PCSrc  = (Branch & TakeBranch) | Jump;
     assign PC_Next = PCSrc ? (Jump ? JumpTarget : BranchTarget) : PC_Plus4;

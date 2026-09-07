@@ -23,7 +23,7 @@ module DataMemory (
     input  wire        clk,
     input  wire        MemWrite,
     input  wire        MemRead,
-    input  wire [2:0]  funct3,       // to know sb/sh/sw
+    input  wire [2:0]  funct3,
     input  wire [31:0] Address,
     input  wire [31:0] WriteData,
     output reg  [31:0] ReadData
@@ -37,7 +37,6 @@ module DataMemory (
             memory[i] = 32'b0;
     end
 
-    // Write with byte enables
     always @(posedge clk) begin
         if (MemWrite) begin
             case (funct3)
@@ -60,7 +59,6 @@ module DataMemory (
         end
     end
 
-    // Read full word (extension done later)
     always @(*) begin
         if (MemRead)
             ReadData = memory[Address[9:2]];

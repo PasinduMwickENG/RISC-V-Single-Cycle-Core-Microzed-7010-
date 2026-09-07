@@ -20,22 +20,17 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module InstructionMemory (
-    input  wire [31:0] Address,       // Byte address from PC
+    input  wire [31:0] Address,
     output reg  [31:0] Instruction
 );
 
-    // 256 instructions (1 KB) - enough for learning
     reg [31:0] memory [0:255];
 
-    // Load program from hex file at start of simulation
     initial begin
         $readmemh("program.hex", memory);
-        // If the file is missing, memory stays unknown (X)
     end
 
-    // Combinational read (word-aligned)
     always @(*) begin
-        // Use word address (Address[9:2] for 256 words)
         Instruction = memory[Address[9:2]];
     end
 

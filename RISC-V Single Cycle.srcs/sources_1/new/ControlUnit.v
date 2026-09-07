@@ -87,8 +87,8 @@ module ControlUnit (
                 RegWrite = 1;
                 ALUSrc   = 1;
             end
-            // fence, ecall, ebreak ? treated as NOP (all signals 0)
         endcase
     end
 
 endmodule
+

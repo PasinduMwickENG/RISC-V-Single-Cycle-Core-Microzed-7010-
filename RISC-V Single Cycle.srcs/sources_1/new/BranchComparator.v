@@ -31,12 +31,12 @@ module BranchComparator (
 
     always @(*) begin
         case (funct3)
-            3'b000: TakeBranch = (A == B);           // BEQ
-            3'b001: TakeBranch = (A != B);           // BNE
-            3'b100: TakeBranch = (As < Bs);          // BLT
-            3'b101: TakeBranch = (As >= Bs);         // BGE
-            3'b110: TakeBranch = (A < B);            // BLTU
-            3'b111: TakeBranch = (A >= B);           // BGEU
+            3'b000: TakeBranch = (A == B);      // BEQ
+            3'b001: TakeBranch = (A != B);      // BNE
+            3'b100: TakeBranch = (As < Bs);     // BLT
+            3'b101: TakeBranch = (As >= Bs);    // BGE
+            3'b110: TakeBranch = (A < B);       // BLTU
+            3'b111: TakeBranch = (A >= B);      // BGEU
             default: TakeBranch = 1'b0;
         endcase
     end

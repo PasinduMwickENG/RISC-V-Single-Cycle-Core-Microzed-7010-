@@ -43,7 +43,6 @@ module ALU (
         endcase
     end
 
-    // This must be OUTSIDE the always block
     assign Zero = (ALUResult == 32'b0);
 
 endmodule

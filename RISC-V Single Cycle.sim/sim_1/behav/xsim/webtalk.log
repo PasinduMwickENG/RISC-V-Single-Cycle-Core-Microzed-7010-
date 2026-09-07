@@ -2,13 +2,13 @@
 # Webtalk v2019.1 (64-bit)
 # SW Build 2552052 on Fri May 24 14:49:42 MDT 2019
 # IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
-# Start of session at: Sat Aug 29 00:39:23 2026
-# Process ID: 11228
+# Start of session at: Mon Aug 31 14:22:36 2026
+# Process ID: 16704
 # Current directory: D:/FPGA-Projects/RISC-V Single Cycle/RISC-V Single Cycle.sim/sim_1/behav/xsim
-# Command line: wbtcv.exe -mode batch -source D:/FPGA-Projects/RISC-V Single Cycle/RISC-V Single Cycle.sim/sim_1/behav/xsim/xsim.dir/ALU_tb_behav/webtalk/xsim_webtalk.tcl -notrace
+# Command line: wbtcv.exe -mode batch -source D:/FPGA-Projects/RISC-V Single Cycle/RISC-V Single Cycle.sim/sim_1/behav/xsim/xsim.dir/RISC_V_tb_behav/webtalk/xsim_webtalk.tcl -notrace
 # Log file: D:/FPGA-Projects/RISC-V Single Cycle/RISC-V Single Cycle.sim/sim_1/behav/xsim/webtalk.log
 # Journal file: D:/FPGA-Projects/RISC-V Single Cycle/RISC-V Single Cycle.sim/sim_1/behav/xsim\webtalk.jou
 #-----------------------------------------------------------
 source D:/FPGA-Projects/RISC-V -notrace
 couldn't read file "D:/FPGA-Projects/RISC-V": permission denied
-INFO: [Common 17-206] Exiting Webtalk at Sat Aug 29 00:39:23 2026...
+INFO: [Common 17-206] Exiting Webtalk at Mon Aug 31 14:22:36 2026...

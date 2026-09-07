@@ -19,36 +19,31 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+module ALU (
+    input  wire [31:0] A,
+    input  wire [31:0] B,
+    input  wire [3:0]  ALUControl,
+    output reg  [31:0] ALUResult,
+    output wire        Zero
+);
 
-module ALU(
+    always @(*) begin
+        case (ALUControl)
+            4'b0000: ALUResult = A + B;                                    // ADD
+            4'b0001: ALUResult = A - B;                                    // SUB
+            4'b0010: ALUResult = A & B;                                    // AND
+            4'b0011: ALUResult = A | B;                                    // OR
+            4'b0100: ALUResult = A ^ B;                                    // XOR
+            4'b0101: ALUResult = ($signed(A) < $signed(B)) ? 32'd1 : 32'd0; // SLT
+            4'b0110: ALUResult = (A < B) ? 32'd1 : 32'd0;                  // SLTU
+            4'b0111: ALUResult = A << B[4:0];                              // SLL
+            4'b1000: ALUResult = A >> B[4:0];                              // SRL
+            4'b1001: ALUResult = $signed(A) >>> B[4:0];                    // SRA
+            default: ALUResult = 32'h00000000;
+        endcase
+    end
 
-input wire [31:0] A,
-input wire [31:0] B,
-input wire [3:0] ALUControl,
-output reg [31:0] ALUResult,
-output reg Zero
+    // This must be OUTSIDE the always block
+    assign Zero = (ALUResult == 32'b0);
 
-    );
-reg [31:0] Result;
-
-always @(*) begin
-    case (ALUControl)
-            4'b0000: Result = A + B;                                                    // ADD
-            4'b0001: Result = A - B;                                                    // SUB
-            4'b0010: Result = A & B;                                                    // AND
-            4'b0011: Result = A | B;                                                    // OR
-            4'b0100: Result = A ^ B;                                                    // XOR
-            4'b0101: Result = ($signed(A) < $signed(B)) ? 32'd1 : 32'd0;                // SLT
-            4'b0110: Result = (A < B) ? 32'd1 : 32'd0;                                  // SLTU
-            4'b0111: Result = A << B[4:0];                                              // SLL (only lower 5 bits)
-            4'b1000: Result = A >> B[4:0];                                              // SRL
-            4'b1001: Result = $signed(A) >>> B[4:0];                                    // SRA (arithmetic)
-            default: Result = 32'hXXXXXXXX;                                             // Undefined → easy to spot
-    endcase
-
-
-assign Zero = (Result == 32'd0);
-assign ALUResult = Result;
-
-end
 endmodule

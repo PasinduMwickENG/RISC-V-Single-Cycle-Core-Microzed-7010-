@@ -20,9 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
+`timescale 1ns / 1ps
+
 module RISC_V_SingleCycle (
-    input  wire clk,
-    input  wire reset
+    input  wire        clk,
+    input  wire        reset,
+    output wire [31:0] PC_out
 );
 
     wire [31:0] PC, PC_Next, PC_Plus4;
@@ -44,6 +47,7 @@ module RISC_V_SingleCycle (
     wire        PCSrc;
     wire [31:0] BranchTarget, JumpTarget;
 
+    // Program Counter
     ProgramCounter PC_reg (
         .clk(clk),
         .reset(reset),
@@ -51,13 +55,16 @@ module RISC_V_SingleCycle (
         .PC(PC)
     );
 
+    assign PC_out   = PC;
     assign PC_Plus4 = PC + 32'd4;
 
+    // Instruction Memory
     InstructionMemory IMEM (
         .Address(PC),
         .Instruction(Instruction)
     );
 
+    // Control Unit
     ControlUnit CU (
         .opcode(Instruction[6:0]),
         .funct3(Instruction[14:12]),
@@ -71,11 +78,13 @@ module RISC_V_SingleCycle (
         .Jump(Jump)
     );
 
+    // Immediate Generator
     ImmGen IMM (
         .Instruction(Instruction),
         .ImmExt(ImmExt)
     );
 
+    // Register File
     RegisterFile RF (
         .clk(clk),
         .we(RegWrite),
@@ -87,6 +96,7 @@ module RISC_V_SingleCycle (
         .rd2(RD2)
     );
 
+    // ALU Control
     ALUControl ALU_CTRL (
         .ALUOp(ALUOp),
         .funct3(Instruction[14:12]),
@@ -96,6 +106,7 @@ module RISC_V_SingleCycle (
 
     assign ALU_B = ALUSrc ? ImmExt : RD2;
 
+    // ALU
     ALU ALU_inst (
         .A(RD1),
         .B(ALU_B),
@@ -104,6 +115,7 @@ module RISC_V_SingleCycle (
         .Zero(Zero)
     );
 
+    // Branch Comparator
     BranchComparator BR_COMP (
         .A(RD1),
         .B(RD2),
@@ -111,6 +123,7 @@ module RISC_V_SingleCycle (
         .TakeBranch(TakeBranch)
     );
 
+    // Data Memory
     DataMemory DMEM (
         .clk(clk),
         .MemWrite(MemWrite),
@@ -121,6 +134,7 @@ module RISC_V_SingleCycle (
         .ReadData(MemReadData)
     );
 
+    // Load Extender
     LoadExtender LOAD_EXT (
         .MemData(MemReadData),
         .Addr(ALUResult[1:0]),
@@ -128,9 +142,11 @@ module RISC_V_SingleCycle (
         .ExtData(LoadData)
     );
 
+    // Write-back
     assign WriteBackData = Jump ? PC_Plus4 :
                            (MemtoReg ? LoadData : ALUResult);
 
+    // Next PC logic
     assign BranchTarget = PC + ImmExt;
     assign JumpTarget   = (Instruction[6:0] == 7'b1100111) ?
                           ((RD1 + ImmExt) & ~32'd1) : (PC + ImmExt);

@@ -1,0 +1,447 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 1000" width="1700" height="1000" style="background:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Drop Shadow Filters -->
+    <filter id="shadow" x="-8%" y="-8%" width="116%" height="118%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+    <filter id="shadow-sm" x="-5%" y="-5%" width="110%" height="112%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.06" />
+    </filter>
+    
+    <!-- Markers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#1e293b" />
+    </marker>
+    <marker id="arrow-ctrl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284c7" />
+    </marker>
+    <marker id="arrow-branch" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#d97706" />
+    </marker>
+    <marker id="arrow-wb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4f46e5" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#16a34a" />
+    </marker>
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0d9488" />
+    </marker>
+  </defs>
+
+  <!-- ================= HEADER & LEGEND ================= -->
+  <g id="header">
+    <rect x="0" y="0" width="1700" height="65" fill="#f8fafc"/>
+    <line x1="0" y1="65" x2="1700" y2="65" stroke="#e2e8f0" stroke-width="1.5" />
+    <text x="40" y="42" font-size="22" font-weight="700" fill="#0f172a" letter-spacing="-0.5">RISC-V Single-Cycle Datapath Architecture</text>
+    <text x="560" y="41" font-size="14" font-weight="500" fill="#64748b">(RV32I Core — Single Clock Cycle Execution)</text>
+    
+    <!-- Legend -->
+    <g transform="translate(1120, 23)">
+      <line x1="0" y1="12" x2="28" y2="12" stroke="#1e293b" stroke-width="2.5" />
+      <text x="35" y="16" font-size="12" font-weight="600" fill="#334155">Data Bus</text>
+      
+      <line x1="120" y1="12" x2="148" y2="12" stroke="#0284c7" stroke-width="2" stroke-dasharray="4,3" />
+      <text x="155" y="16" font-size="12" font-weight="600" fill="#0284c7">Control Signal</text>
+
+      <line x1="260" y1="12" x2="288" y2="12" stroke="#4f46e5" stroke-width="2.5" />
+      <text x="295" y="16" font-size="12" font-weight="600" fill="#4f46e5">Write-Back Data</text>
+
+      <line x1="420" y1="12" x2="448" y2="12" stroke="#d97706" stroke-width="2" stroke-dasharray="4,3" />
+      <text x="455" y="16" font-size="12" font-weight="600" fill="#d97706">Branch / Target</text>
+    </g>
+  </g>
+
+  <!-- ================= STAGE BOUNDARY BOXES ================= -->
+  <!-- Fetch Stage -->
+  <rect x="25" y="85" width="385" height="800" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6,6" />
+  <text x="40" y="112" font-size="13" font-weight="700" fill="#94a3b8" letter-spacing="1">STAGE 1: INSTRUCTION FETCH</text>
+
+  <!-- Decode Stage -->
+  <rect x="425" y="85" width="405" height="800" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6,6" />
+  <text x="440" y="112" font-size="13" font-weight="700" fill="#94a3b8" letter-spacing="1">STAGE 2: DECODE &amp; REGISTERS</text>
+
+  <!-- Execute Stage -->
+  <rect x="845" y="85" width="295" height="800" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6,6" />
+  <text x="860" y="112" font-size="13" font-weight="700" fill="#94a3b8" letter-spacing="1">STAGE 3: EXECUTE</text>
+
+  <!-- Memory & Write-back Stage -->
+  <rect x="1155" y="85" width="520" height="800" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6,6" />
+  <text x="1170" y="112" font-size="13" font-weight="700" fill="#94a3b8" letter-spacing="1">STAGE 4 &amp; 5: MEMORY &amp; WRITE-BACK</text>
+
+
+  <!-- ============================================================ -->
+  <!-- 1. FETCH STAGE: PC MUX, PC, ADDERS, INSTRUCTION MEMORY -->
+  <!-- ============================================================ -->
+  
+  <!-- Next-PC Mux -->
+  <g transform="translate(75, 435)">
+    <polygon points="0,0 35,16 35,94 0,110" fill="#ffffff" stroke="#0284c7" stroke-width="2" filter="url(#shadow-sm)"/>
+    <text x="14" y="28" font-size="11" font-weight="600" fill="#64748b">0</text>
+    <text x="14" y="58" font-size="11" font-weight="600" fill="#64748b">1</text>
+    <text x="14" y="88" font-size="11" font-weight="600" fill="#64748b">2</text>
+    <text x="17" y="130" font-size="11" font-weight="700" fill="#0284c7" text-anchor="middle">PC MUX</text>
+  </g>
+
+  <!-- PC Register -->
+  <rect x="150" y="435" width="90" height="110" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="195" y="475" font-size="16" font-weight="700" fill="#1e3a8a" text-anchor="middle">PC</text>
+  <text x="195" y="497" font-size="11" font-weight="500" fill="#3b82f6" text-anchor="middle">Program</text>
+  <text x="195" y="512" font-size="11" font-weight="500" fill="#3b82f6" text-anchor="middle">Counter</text>
+  <path d="M 150 522 L 160 527 L 150 532" fill="none" stroke="#3b82f6" stroke-width="1.5" />
+  <text x="165" y="530" font-size="9" font-weight="600" fill="#64748b">clk</text>
+
+  <!-- PC + 4 Adder -->
+  <g transform="translate(220, 230)">
+    <polygon points="0,0 50,15 50,65 0,80 0,50 15,40 0,30" fill="#f0fdf4" stroke="#16a34a" stroke-width="2" filter="url(#shadow-sm)"/>
+    <text x="28" y="45" font-size="18" font-weight="700" fill="#15803d" text-anchor="middle">+</text>
+    <text x="25" y="100" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">Add +4</text>
+  </g>
+
+  <!-- Branch Target Adder (PC + ImmExt) -->
+  <g transform="translate(325, 230)">
+    <polygon points="0,0 50,15 50,65 0,80 0,50 15,40 0,30" fill="#fefce8" stroke="#ca8a04" stroke-width="2" filter="url(#shadow-sm)"/>
+    <text x="28" y="45" font-size="18" font-weight="700" fill="#a16207" text-anchor="middle">+</text>
+    <text x="25" y="100" font-size="11" font-weight="700" fill="#a16207" text-anchor="middle">Branch Target</text>
+  </g>
+
+  <!-- Instruction Memory (IMEM) -->
+  <rect x="290" y="430" width="120" height="120" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="350" y="465" font-size="15" font-weight="700" fill="#1e3a8a" text-anchor="middle">Instruction</text>
+  <text x="350" y="485" font-size="15" font-weight="700" fill="#1e3a8a" text-anchor="middle">Memory</text>
+  <text x="298" y="515" font-size="10" font-weight="600" fill="#64748b">Addr</text>
+  <text x="402" y="515" font-size="10" font-weight="600" fill="#64748b" text-anchor="end">Instr</text>
+  <text x="350" y="538" font-size="10" font-weight="500" fill="#3b82f6" text-anchor="middle">ROM / BRAM</text>
+
+
+  <!-- ============================================================ -->
+  <!-- 2. DECODE STAGE: CONTROL UNIT, REGISTER FILE, IMMGEN -->
+  <!-- ============================================================ -->
+
+  <!-- Control Unit -->
+  <rect x="465" y="160" width="145" height="215" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
+  <text x="537" y="188" font-size="15" font-weight="700" fill="#b45309" text-anchor="middle">Control Unit</text>
+  <text x="475" y="215" font-size="10" font-weight="600" fill="#92400e">opcode [6:0]</text>
+  <text x="475" y="235" font-size="10" font-weight="600" fill="#92400e">funct3 [2:0]</text>
+  
+  <!-- Control Unit output labels -->
+  <text x="600" y="210" font-size="9" font-weight="600" fill="#0284c7" text-anchor="end">RegWrite</text>
+  <text x="600" y="230" font-size="9" font-weight="600" fill="#0284c7" text-anchor="end">ALUSrc</text>
+  <text x="600" y="250" font-size="9" font-weight="600" fill="#0284c7" text-anchor="end">Branch, Jump</text>
+  <text x="600" y="275" font-size="9" font-weight="600" fill="#0284c7" text-anchor="end">MemWrite</text>
+  <text x="600" y="295" font-size="9" font-weight="600" fill="#0284c7" text-anchor="end">MemRead</text>
+  <text x="600" y="325" font-size="9" font-weight="600" fill="#0284c7" text-anchor="end">ALUOp [1:0]</text>
+  <text x="600" y="355" font-size="9" font-weight="600" fill="#0284c7" text-anchor="end">MemtoReg, Jump</text>
+
+  <!-- Register File (RF) -->
+  <rect x="465" y="415" width="155" height="195" rx="8" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="542" y="442" font-size="15" font-weight="700" fill="#5b21b6" text-anchor="middle">Register File</text>
+  <text x="542" y="458" font-size="10" font-weight="500" fill="#7c3aed" text-anchor="middle">32 x 32-bit (x0 = 0)</text>
+
+  <text x="475" y="485" font-size="10" font-weight="600" fill="#64748b">rs1 [19:15]</text>
+  <text x="475" y="515" font-size="10" font-weight="600" fill="#64748b">rs2 [24:20]</text>
+  <text x="475" y="545" font-size="10" font-weight="600" fill="#64748b">rd  [11:7]</text>
+  <text x="475" y="575" font-size="10" font-weight="700" fill="#4f46e5">WriteData</text>
+
+  <text x="608" y="485" font-size="10" font-weight="700" fill="#1e293b" text-anchor="end">RD1 (A)</text>
+  <text x="608" y="545" font-size="10" font-weight="700" fill="#1e293b" text-anchor="end">RD2 (B)</text>
+  <text x="542" y="425" font-size="9" font-weight="700" fill="#0284c7" text-anchor="middle">RegWrite</text>
+
+  <!-- Immediate Generator (ImmGen) -->
+  <rect x="465" y="660" width="155" height="95" rx="8" fill="#f0fdfa" stroke="#14b8a6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="542" y="690" font-size="14" font-weight="700" fill="#0f766e" text-anchor="middle">Imm Gen</text>
+  <text x="542" y="706" font-size="10" font-weight="500" fill="#0f766e" text-anchor="middle">Immediate Generator</text>
+  <text x="475" y="732" font-size="10" font-weight="600" fill="#64748b">Instr [31:0]</text>
+  <text x="608" y="732" font-size="10" font-weight="700" fill="#0f766e" text-anchor="end">ImmExt</text>
+
+
+  <!-- ============================================================ -->
+  <!-- 3. EXECUTE STAGE: BRANCH COMP, ALU MUX, ALU, ALU CONTROL -->
+  <!-- ============================================================ -->
+
+  <!-- Branch Comparator -->
+  <rect x="685" y="250" width="115" height="85" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="2" filter="url(#shadow-sm)"/>
+  <text x="742" y="275" font-size="13" font-weight="700" fill="#c2410c" text-anchor="middle">Branch Comp</text>
+  <text x="742" y="290" font-size="9" font-weight="500" fill="#ea580c" text-anchor="middle">beq, bne, blt, bge...</text>
+  <text x="693" y="312" font-size="9" font-weight="600" fill="#64748b">RD1, RD2, funct3</text>
+
+  <!-- PCSrc Branch/Jump Logic (moved right for a wider TakeBranch gap) -->
+  <g transform="translate(870, 245)">
+    <rect x="0" y="0" width="115" height="95" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="2" filter="url(#shadow-sm)"/>
+    <text x="57" y="26" font-size="12" font-weight="700" fill="#b45309" text-anchor="middle">PCSrc Logic</text>
+    <text x="57" y="46" font-size="9" font-weight="600" fill="#92400e" text-anchor="middle">Branch &amp; TakeBranch</text>
+    <text x="57" y="60" font-size="9" font-weight="600" fill="#92400e" text-anchor="middle">| Jump</text>
+    <text x="57" y="82" font-size="11" font-weight="700" fill="#d97706" text-anchor="middle">PCSrc Select</text>
+  </g>
+
+  <!-- ALU Input B MUX -->
+  <g transform="translate(725, 520)">
+    <polygon points="0,0 35,12 35,68 0,80" fill="#ffffff" stroke="#0284c7" stroke-width="2" filter="url(#shadow-sm)"/>
+    <text x="12" y="25" font-size="11" font-weight="600" fill="#64748b">0</text>
+    <text x="12" y="65" font-size="11" font-weight="600" fill="#64748b">1</text>
+    <text x="17" y="100" font-size="10" font-weight="700" fill="#0284c7" text-anchor="middle">ALU MUX</text>
+  </g>
+
+  <!-- ALU Control -->
+  <rect x="705" y="660" width="125" height="95" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2" filter="url(#shadow-sm)"/>
+  <text x="767" y="690" font-size="13" font-weight="700" fill="#b45309" text-anchor="middle">ALU Control</text>
+  <text x="715" y="715" font-size="9" font-weight="600" fill="#64748b">ALUOp [1:0]</text>
+  <text x="715" y="735" font-size="9" font-weight="600" fill="#64748b">funct3, funct7</text>
+  <text x="820" y="725" font-size="9" font-weight="700" fill="#b45309" text-anchor="end">Ctrl [3:0]</text>
+
+  <!-- Arithmetic Logic Unit (ALU) -->
+  <g transform="translate(905, 455)">
+    <polygon points="0,0 80,30 80,120 0,150 0,95 20,75 0,55" fill="#f1f5f9" stroke="#0f172a" stroke-width="2.5" filter="url(#shadow)"/>
+    <text x="44" y="82" font-size="20" font-weight="800" fill="#0f172a" text-anchor="middle">ALU</text>
+    <text x="-12" y="32" font-size="11" font-weight="700" fill="#1e293b">A</text>
+    <text x="-12" y="128" font-size="11" font-weight="700" fill="#1e293b">B</text>
+    <text x="72" y="52" font-size="9" font-weight="600" fill="#64748b" text-anchor="end">Zero</text>
+  </g>
+
+
+  <!-- ============================================================ -->
+  <!-- 4. MEMORY & WRITE-BACK: DMEM, LOAD EXTENDER, WB MUX -->
+  <!-- ============================================================ -->
+
+  <!-- Data Memory (DMEM) -->
+  <rect x="1175" y="450" width="150" height="160" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="1250" y="478" font-size="15" font-weight="700" fill="#1e3a8a" text-anchor="middle">Data Memory</text>
+  <text x="1250" y="496" font-size="10" font-weight="500" fill="#2563eb" text-anchor="middle">RAM (Byte-Addressable)</text>
+  <text x="1185" y="530" font-size="10" font-weight="600" fill="#64748b">Address</text>
+  <text x="1185" y="580" font-size="10" font-weight="600" fill="#64748b">WriteData</text>
+  <text x="1315" y="530" font-size="10" font-weight="700" fill="#1e293b" text-anchor="end">ReadData</text>
+  <text x="1250" y="432" font-size="9" font-weight="700" fill="#0284c7" text-anchor="middle">MemWrite / MemRead</text>
+
+  <!-- Load Extender -->
+  <rect x="1365" y="490" width="115" height="95" rx="8" fill="#fdf4ff" stroke="#c026d3" stroke-width="2" filter="url(#shadow-sm)"/>
+  <text x="1422" y="518" font-size="13" font-weight="700" fill="#86198f" text-anchor="middle">Load Extender</text>
+  <text x="1422" y="534" font-size="9" font-weight="500" fill="#a21caf" text-anchor="middle">lb, lh, lw, lbu, lhu</text>
+  <text x="1372" y="565" font-size="9" font-weight="600" fill="#64748b">addr[1:0]</text>
+  <text x="1470" y="565" font-size="9" font-weight="700" fill="#86198f" text-anchor="end">ExtData</text>
+
+  <!-- Write-Back Mux (3-to-1) -->
+  <g transform="translate(1530, 435)">
+    <polygon points="0,0 45,18 45,142 0,160" fill="#ffffff" stroke="#4f46e5" stroke-width="2" filter="url(#shadow)"/>
+    <text x="24" y="40" font-size="10" font-weight="700" fill="#15803d" text-anchor="middle">0: PC+4</text>
+    <text x="24" y="85" font-size="10" font-weight="700" fill="#0f172a" text-anchor="middle">1: ALU</text>
+    <text x="24" y="130" font-size="10" font-weight="700" fill="#86198f" text-anchor="middle">2: Mem</text>
+    <text x="22" y="185" font-size="11" font-weight="700" fill="#4f46e5" text-anchor="middle">WB MUX</text>
+  </g>
+
+
+  <!-- ============================================================ -->
+  <!-- 5. WIRES, BUSES & SIGNALS (DATA PATH) -->
+  <!-- ============================================================ -->
+
+  <!-- PC Output -> IMEM + Adders -->
+  <line x1="240" y1="490" x2="265" y2="490" stroke="#1e293b" stroke-width="2.5" />
+  <circle cx="265" cy="490" r="3.5" fill="#1e293b" />
+  <!-- To IMEM Addr -->
+  <line x1="265" y1="490" x2="290" y2="490" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <text x="268" y="482" font-size="9" font-weight="700" fill="#1e293b">PC</text>
+  
+  <!-- Up to PC+4 adder (PC input at 220, 275) -->
+  <line x1="265" y1="490" x2="265" y2="358" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="265" y1="358" x2="205" y2="358" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="205" y1="358" x2="205" y2="275" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="205" y1="275" x2="220" y2="275" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  
+  <!-- Constant 4 into PC+4 adder (at 220, 245) -->
+  <line x1="188" y1="245" x2="220" y2="245" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)" />
+  <text x="178" y="248" font-size="11" font-weight="700" fill="#16a34a">4</text>
+  
+  <!-- Up to Branch Target adder (PC input at 325, 250) -->
+  <line x1="265" y1="358" x2="300" y2="358" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="300" y1="358" x2="300" y2="250" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="300" y1="250" x2="325" y2="250" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <!-- PC + 4 Output Wire Distribution -->
+  <line x1="270" y1="270" x2="298" y2="270" stroke="#15803d" stroke-width="2.5" />
+  <circle cx="298" cy="270" r="3.5" fill="#15803d" />
+  <!-- To Next-PC MUX input 0 (via top corridor y = 168) -->
+  <line x1="298" y1="270" x2="298" y2="168" stroke="#15803d" stroke-width="2.5" />
+  <line x1="298" y1="168" x2="38" y2="168" stroke="#15803d" stroke-width="2.5" />
+  <line x1="38" y1="168" x2="38" y2="455" stroke="#15803d" stroke-width="2.5" />
+  <line x1="38" y1="455" x2="75" y2="455" stroke="#15803d" stroke-width="2.5" marker-end="url(#arrow-green)" />
+  <text x="120" y="161" font-size="10" font-weight="700" fill="#15803d">PC + 4 (Sequential Next PC)</text>
+
+  <!-- PC + 4 to Write-Back MUX (Return link for JAL / JALR), kept 45px clear of the ALUResult corridor -->
+  <line x1="298" y1="168" x2="1470" y2="168" stroke="#15803d" stroke-width="2" />
+  <line x1="1470" y1="168" x2="1470" y2="460" stroke="#15803d" stroke-width="2" />
+  <line x1="1470" y1="460" x2="1530" y2="460" stroke="#15803d" stroke-width="2" marker-end="url(#arrow-green)" />
+  <text x="960" y="161" font-size="10" font-weight="700" fill="#15803d">PC + 4 (Return Link to rd for JAL / JALR)</text>
+
+  <!-- Branch Target Adder Output to Next-PC MUX input 1 -->
+  <line x1="375" y1="270" x2="405" y2="270" stroke="#ca8a04" stroke-width="2.5" />
+  <line x1="405" y1="270" x2="405" y2="196" stroke="#ca8a04" stroke-width="2.5" />
+  <line x1="405" y1="196" x2="16" y2="196" stroke="#ca8a04" stroke-width="2.5" />
+  <line x1="16" y1="196" x2="16" y2="485" stroke="#ca8a04" stroke-width="2.5" />
+  <line x1="16" y1="485" x2="75" y2="485" stroke="#ca8a04" stroke-width="2.5" marker-end="url(#arrow-branch)" />
+  <text x="150" y="191" font-size="10" font-weight="700" fill="#a16207">Branch Target (PC + ImmExt)</text>
+
+  <!-- Next-PC MUX Output -> PC Register Input -->
+  <line x1="110" y1="490" x2="150" y2="490" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <text x="115" y="482" font-size="9" font-weight="700" fill="#1e293b">PC_Next</text>
+
+  <!-- IMEM Instruction Out Bus & Distribution -->
+  <line x1="410" y1="490" x2="435" y2="490" stroke="#1e293b" stroke-width="3" />
+  <circle cx="435" cy="490" r="4" fill="#1e293b" />
+  <text x="405" y="475" font-size="10" font-weight="700" fill="#1e293b">Instruction [31:0]</text>
+
+  <!-- Instr to Control Unit (opcode, funct3) -->
+  <line x1="435" y1="490" x2="435" y2="225" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="435" y1="225" x2="465" y2="225" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  
+  <!-- Instr to Register File (rs1, rs2, rd) -->
+  <line x1="435" y1="485" x2="465" y2="485" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <line x1="435" y1="515" x2="465" y2="515" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <line x1="435" y1="545" x2="465" y2="545" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <!-- Instr down to ImmGen -->
+  <line x1="435" y1="490" x2="435" y2="710" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="435" y1="710" x2="465" y2="710" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <!-- ImmGen ImmExt Output & Routing -->
+  <line x1="620" y1="710" x2="655" y2="710" stroke="#0d9488" stroke-width="2.5" />
+  <circle cx="655" cy="710" r="3.5" fill="#0d9488" />
+  <!-- ImmExt to ALU MUX input 1 -->
+  <line x1="655" y1="710" x2="655" y2="575" stroke="#0d9488" stroke-width="2.5" />
+  <line x1="655" y1="575" x2="725" y2="575" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)" />
+  <text x="662" y="570" font-size="9" font-weight="700" fill="#0d9488">ImmExt</text>
+
+  <!-- ImmExt back to Branch Target Adder (at 325, 280) -->
+  <line x1="655" y1="710" x2="655" y2="795" stroke="#0d9488" stroke-width="2" />
+  <line x1="655" y1="795" x2="308" y2="795" stroke="#0d9488" stroke-width="2" />
+  <line x1="308" y1="795" x2="308" y2="280" stroke="#0d9488" stroke-width="2" />
+  <line x1="308" y1="280" x2="325" y2="280" stroke="#0d9488" stroke-width="2" marker-end="url(#arrow-teal)" />
+  <text x="420" y="788" font-size="10" font-weight="700" fill="#0d9488">ImmExt [31:0] to Branch &amp; Jump Target</text>
+
+  <!-- Register File Outputs: -->
+  <!-- RD1 to ALU Input A -->
+  <line x1="620" y1="485" x2="670" y2="485" stroke="#1e293b" stroke-width="2.5" />
+  <circle cx="670" cy="485" r="3.5" fill="#1e293b" />
+  <line x1="670" y1="485" x2="905" y2="485" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <text x="675" y="478" font-size="10" font-weight="700" fill="#1e293b">RD1</text>
+  <!-- RD1 tap up to Branch Comparator -->
+  <line x1="670" y1="485" x2="670" y2="290" stroke="#1e293b" stroke-width="2" />
+  <line x1="670" y1="290" x2="685" y2="290" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- RD2 Output -->
+  <line x1="620" y1="545" x2="645" y2="545" stroke="#1e293b" stroke-width="2.5" />
+  <circle cx="645" cy="545" r="3.5" fill="#1e293b" />
+  <!-- RD2 to ALU MUX Input 0 -->
+  <line x1="645" y1="545" x2="645" y2="535" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="645" y1="535" x2="725" y2="535" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <text x="660" y="530" font-size="10" font-weight="700" fill="#1e293b">RD2</text>
+  <!-- RD2 tap to Branch Comparator -->
+  <line x1="645" y1="545" x2="645" y2="315" stroke="#1e293b" stroke-width="2" />
+  <line x1="645" y1="315" x2="685" y2="315" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)" />
+  <!-- RD2 bypass across to Data Memory WriteData -->
+  <line x1="645" y1="545" x2="645" y2="625" stroke="#1e293b" stroke-width="2" />
+  <line x1="645" y1="625" x2="1140" y2="625" stroke="#1e293b" stroke-width="2" />
+  <line x1="1140" y1="625" x2="1140" y2="585" stroke="#1e293b" stroke-width="2" />
+  <line x1="1140" y1="585" x2="1175" y2="585" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="900" y="620" font-size="10" font-weight="700" fill="#1e293b">WriteData (RD2)</text>
+
+  <!-- ALU Input B from ALU MUX -->
+  <line x1="760" y1="560" x2="905" y2="560" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <text x="810" y="552" font-size="10" font-weight="700" fill="#1e293b">ALU_B</text>
+
+  <!-- ALU Control to ALU -->
+  <line x1="830" y1="705" x2="960" y2="705" stroke="#f59e0b" stroke-width="2" />
+  <line x1="960" y1="705" x2="960" y2="585" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-ctrl)" />
+  <text x="850" y="698" font-size="9" font-weight="700" fill="#b45309">ALUControl [3:0]</text>
+
+  <!-- ALU Result Distribution -->
+  <line x1="985" y1="530" x2="1050" y2="530" stroke="#1e293b" stroke-width="3" />
+  <circle cx="1050" cy="530" r="4" fill="#1e293b" />
+  <text x="990" y="520" font-size="11" font-weight="700" fill="#1e293b">ALUResult</text>
+  
+  <!-- ALUResult to Data Memory Address -->
+  <line x1="1050" y1="530" x2="1175" y2="530" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  
+  <!-- ALUResult down to Load Extender addr[1:0] -->
+  <line x1="1050" y1="530" x2="1050" y2="650" stroke="#1e293b" stroke-width="2" />
+  <line x1="1050" y1="650" x2="1345" y2="650" stroke="#1e293b" stroke-width="2" />
+  <line x1="1345" y1="650" x2="1345" y2="555" stroke="#1e293b" stroke-width="2" />
+  <line x1="1345" y1="555" x2="1365" y2="555" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- ALUResult to Write-Back MUX (Input 1: ALU) - routed at y=405, kept clear of control corridors above -->
+  <line x1="1050" y1="530" x2="1050" y2="405" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="1050" y1="405" x2="1514" y2="405" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="1514" y1="405" x2="1514" y2="505" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="1514" y1="505" x2="1530" y2="505" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <!-- Data Memory ReadData to Load Extender -->
+  <line x1="1325" y1="535" x2="1365" y2="535" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <text x="1330" y="528" font-size="9" font-weight="600" fill="#64748b">MemData</text>
+
+  <!-- Load Extender to Write-Back MUX (Input 2: Mem) -->
+  <line x1="1480" y1="550" x2="1530" y2="550" stroke="#86198f" stroke-width="2.5" marker-end="url(#arrow)" />
+  <text x="1482" y="542" font-size="9" font-weight="700" fill="#86198f">LoadData</text>
+
+  <!-- Write-Back MUX Output Feedback Loop to Register File WriteData -->
+  <line x1="1575" y1="515" x2="1615" y2="515" stroke="#4f46e5" stroke-width="3" />
+  <line x1="1615" y1="515" x2="1615" y2="840" stroke="#4f46e5" stroke-width="3" />
+  <line x1="1615" y1="840" x2="450" y2="840" stroke="#4f46e5" stroke-width="3" />
+  <line x1="450" y1="840" x2="450" y2="575" stroke="#4f46e5" stroke-width="3" />
+  <line x1="450" y1="575" x2="465" y2="575" stroke="#4f46e5" stroke-width="2.5" marker-end="url(#arrow-wb)" />
+  <text x="1030" y="830" font-size="13" font-weight="700" fill="#4f46e5" text-anchor="middle">WriteBackData [31:0] (to Register File WriteData)</text>
+
+
+  <!-- ============================================================ -->
+  <!-- 6. CONTROL SIGNALS ROUTING - each own lane, >=20px apart      -->
+  <!-- ============================================================ -->
+
+  <!-- Branch Comp TakeBranch to PCSrc Logic (wide 55px gap between boxes now) -->
+  <line x1="800" y1="292" x2="870" y2="292" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-branch)" />
+  <text x="835" y="284" font-size="9" font-weight="700" fill="#ea580c" text-anchor="middle">TakeBranch</text>
+
+  <!-- Control Unit: Branch & Jump routed ABOVE Branch Comp directly to PCSrc Logic -->
+  <line x1="610" y1="250" x2="635" y2="250" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="635" y1="250" x2="635" y2="212" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="635" y1="212" x2="927" y2="212" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="927" y1="212" x2="927" y2="245" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#arrow-ctrl)" />
+  <text x="735" y="205" font-size="9" font-weight="600" fill="#0284c7">Branch, Jump</text>
+
+  <!-- PCSrc Select feedback to Next-PC MUX control pin (own corridor y = 130) -->
+  <line x1="927" y1="245" x2="927" y2="130" stroke="#d97706" stroke-width="2" stroke-dasharray="4,3" />
+  <line x1="927" y1="130" x2="93" y2="130" stroke="#d97706" stroke-width="2" stroke-dasharray="4,3" />
+  <line x1="93" y1="130" x2="93" y2="435" stroke="#d97706" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-branch)" />
+  <text x="230" y="125" font-size="10" font-weight="700" fill="#d97706">PCSrc Select ((Branch &amp; TakeBranch) | Jump)</text>
+
+  <!-- ALUSrc from CU to ALU MUX: own lane x=660 -->
+  <line x1="610" y1="230" x2="660" y2="230" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="660" y1="230" x2="660" y2="500" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="660" y1="500" x2="742" y2="500" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="742" y1="500" x2="742" y2="520" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#arrow-ctrl)" />
+  <text x="746" y="450" font-size="9" font-weight="700" fill="#0284c7">ALUSrc</text>
+
+  <!-- RegWrite from CU to Register File -->
+  <line x1="542" y1="375" x2="542" y2="415" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#arrow-ctrl)" />
+
+  <!-- MemWrite & MemRead from CU to Data Memory: own lane x=685 (20px clear of ALUSrc's 660 lane) -->
+  <line x1="610" y1="285" x2="685" y2="285" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="685" y1="285" x2="685" y2="390" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="685" y1="390" x2="1250" y2="390" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="1250" y1="390" x2="1250" y2="450" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#arrow-ctrl)" />
+  <text x="1080" y="383" font-size="9" font-weight="700" fill="#0284c7">MemWrite / MemRead</text>
+
+  <!-- ALUOp from CU to ALU Control: own lane x=710 (20px clear of MemWrite/MemRead's 685 lane) -->
+  <line x1="610" y1="325" x2="710" y2="325" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="710" y1="325" x2="710" y2="685" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="710" y1="685" x2="705" y2="685" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#arrow-ctrl)" />
+  <text x="714" y="665" font-size="9" font-weight="700" fill="#0284c7">ALUOp</text>
+
+  <!-- MemtoReg & Jump from CU to Write-Back MUX: routed at y=355 (35px clear of MemWrite/MemRead's y=390 corridor) -->
+  <line x1="610" y1="355" x2="1553" y2="355" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" />
+  <line x1="1553" y1="355" x2="1553" y2="435" stroke="#0284c7" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#arrow-ctrl)" />
+  <text x="1380" y="348" font-size="9" font-weight="700" fill="#0284c7">MemtoReg, Jump</text>
+
+
+  <!-- ================= FOOTER ================= -->
+  <g transform="translate(40, 975)">
+    <text x="0" y="0" font-size="12" font-weight="600" fill="#94a3b8">Implemented in Verilog (RISC_V_SingleCycle.v) • Single-Cycle RV32I Processor Architecture</text>
+    <text x="1620" y="0" font-size="12" font-weight="600" fill="#94a3b8" text-anchor="end">Xilinx Vivado • Zynq-7000 FPGA</text>
+  </g>
+</svg>

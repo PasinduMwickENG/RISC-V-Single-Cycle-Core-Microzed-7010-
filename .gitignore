@@ -1,0 +1,44 @@
+# Reference material (kept local only)
+/docs
+
+# ------------------------------------------------------------------
+# Xilinx Vivado generated project directories
+# These are all regenerated from the .xpr project file + sources,
+# so there is no need to track them in git.
+# ------------------------------------------------------------------
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.sdk/
+*.srcs/**/ip/**/sim/
+*.srcs/**/ip/**/synth/
+*.srcs/**/bd/*/ip/
+*.srcs/**/bd/*/hw_handoff/
+*.srcs/**/bd/*/sim/
+*.srcs/**/bd/*/synth/
+*.srcs/**/bd/*/ipshared/
+*.srcs/**/bd/*/ui/
+
+# Xilinx SDK / Vitis workspace + BSP (regenerated from the hardware handoff)
+hello_bsp/
+*.sdk/
+*.metadata/
+*.hbs
+*.hdf
+
+# Vivado journals, logs and misc artifacts
+*.jou
+*.log
+*.pb
+*.str
+*.backup.jou
+*.backup.log
+.Xil/
+vivado*.jou
+vivado*.log
+webtalk*.jou
+webtalk*.log
+usage_statistics_webtalk.html
+usage_statistics_webtalk.xml
